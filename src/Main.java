@@ -15,7 +15,6 @@ public class Main {
         String filename = resource.getPath();
 
         AbstractHashTable<String> bitMix = new BitMixHashTable<>();
-        AbstractHashTable<String> fibo = new FibonacciHashTable<>();
 
         try {
             // Leitura dos nomes
@@ -33,19 +32,6 @@ public class Main {
                 bitMix.contains(names.get(i));
             }
             long endSearchBM = System.nanoTime();
-
-            // Relatório para FibonacciHashTable
-            long startInsertFH = System.nanoTime();
-            for (int i = 0; i < names.size(); i++) {
-                fibo.insert(names.get(i));
-            }
-            long endInsertFH = System.nanoTime();
-
-            long startSearchFH = System.nanoTime();
-            for (int i = 0; i < names.size(); i++) {
-                fibo.contains(names.get(i));
-            }
-            long endSearchFH = System.nanoTime();
 
             System.out.println("=== Relatório de Desempenho e Colisões ===\n");
 

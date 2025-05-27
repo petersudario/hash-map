@@ -1,97 +1,89 @@
-import java.util.ArrayList;
-
+import libs.Node;
+import libs.MeuArrayList;
+import libs.Node;
 /**
- * Classe abstrata para tabela hash com encadeamento separado.
- * Usa lista encadeada em cada bucket para tratar colisões.
+ * Implementação abstrata de tabela hash com encadeamento separado,
+ * fator de carga e redimensionamento automático.
+ *
  * @param <K> Tipo da chave
  */
 public abstract class AbstractHashTable<K> {
-    protected final int capacity = 16;      // Ajustado para 16 buckets
-    protected final ArrayList<Node<K>> table;
+    protected int capacity;
+    protected MeuArrayList<Node<K>> table;
+    protected int size = 0;
     protected int collisions = 0;
+    protected final double LOAD_FACTOR = 0.75;
 
     public AbstractHashTable() {
-        table = new ArrayList<>(capacity);
+        this.capacity = 16;
+        this.table = new MeuArrayList<>(capacity);
         for (int i = 0; i < capacity; i++) {
-            table.add(null);
+            table.append(null);
         }
     }
 
-    /**
-     * Converte a chave em um valor inteiro bruto (pode ser fora de [0,capacity)).
-     */
+    /** Converte chave em valor inteiro bruto. */
     protected abstract int hash(K key);
 
-    /**
-     * Normaliza índice para o intervalo [0..capacity-1] usando floorMod.
-     */
+    /** Garante índice válido em [0..capacity-1]. */
     private int normalize(int raw) {
         return Math.floorMod(raw, capacity);
     }
 
-    /**
-     * Insere a chave na tabela; incrementa colisões se bucket ocupado.
-     */
+    /** Insere chave, conta colisões e verifica fator de carga. */
     public void insert(K key) {
         int idx = normalize(hash(key));
         Node<K> head = table.get(idx);
         if (head != null) collisions++;
         table.set(idx, new Node<>(key, head));
+        size++;
+        if ((double) size / capacity > LOAD_FACTOR) {
+            resize();
+        }
     }
 
-    /**
-     * Verifica se a chave existe na tabela.
-     */
+    /** Duplica capacity e rehash de todos os elementos. */
+    private void resize() {
+        int oldCap = capacity;
+        MeuArrayList<Node<K>> oldTable = table;
+
+        capacity *= 2;
+        table = new MeuArrayList<>(capacity);
+        for (int i = 0; i < capacity; i++) {
+            table.append(null);
+        }
+        size = 0;
+        collisions = 0;
+
+        for (int i = 0; i < oldCap; i++) {
+            for (Node<K> n = oldTable.get(i); n != null; n = n.next) {
+                insert(n.key);
+            }
+        }
+    }
+
+    /** Verifica se a chave existe na tabela. */
     public boolean contains(K key) {
         int idx = normalize(hash(key));
-        for (Node<K> curr = table.get(idx); curr != null; curr = curr.next) {
-            if (curr.key.equals(key)) return true;
+        for (Node<K> n = table.get(idx); n != null; n = n.next) {
+            if (n.key.equals(key)) return true;
         }
         return false;
     }
 
-    /**
-     * Remove um elemento da tabela.
-     */
-    public boolean remove(K key) {
-        int idx = normalize(hash(key));
-        Node<K> curr = table.get(idx), prev = null;
-        while (curr != null) {
-            if (curr.key.equals(key)) {
-                if (prev == null) table.set(idx, curr.next);
-                else prev.next = curr.next;
-                return true;
-            }
-            prev = curr;
-            curr = curr.next;
-        }
-        return false;
+    /** Retorna número total de colisões ocorridas. */
+    public int getCollisions() {
+        return collisions;
     }
 
-    /**
-     * Retorna número de colisões.
-     */
-    public int getCollisions() { return collisions; }
-
-    /**
-     * Retorna distribuição de elementos por bucket.
-     */
+    /** Retorna distribuição de elementos por bucket. */
     public int[] getDistribution() {
         int[] dist = new int[capacity];
         for (int i = 0; i < capacity; i++) {
-            for (Node<K> curr = table.get(i); curr != null; curr = curr.next) {
+            for (Node<K> n = table.get(i); n != null; n = n.next) {
                 dist[i]++;
             }
         }
         return dist;
-    }
-
-    /**
-     * Nó da lista encadeada para colisões.
-     */
-    protected static class Node<K> {
-        K key;
-        Node<K> next;
-        Node(K key, Node<K> next) { this.key = key; this.next = next; }
     }
 }
