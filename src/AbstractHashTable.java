@@ -1,6 +1,6 @@
 import libs.Node;
 import libs.MeuArrayList;
-import libs.Node;
+
 /**
  * Implementação abstrata de tabela hash com encadeamento separado,
  * fator de carga e redimensionamento automático.

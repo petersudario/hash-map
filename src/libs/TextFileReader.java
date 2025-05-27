@@ -3,7 +3,6 @@ package libs;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Utilitário para leitura de arquivos de texto em seu projeto.
@@ -15,14 +14,14 @@ public class TextFileReader {
      * @return linhas lidas do arquivo
      * @throws IOException se ocorrer erro de I/O
      */
-    public static ArrayList<String> readLines(String filename) throws IOException {
-        ArrayList<String> lines = new ArrayList<>();
+    public static MeuArrayList<String> readLines(String filename) throws IOException {
+        MeuArrayList<String> lines = new MeuArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             String line;
             while ((line = br.readLine()) != null) {
                 line = line.trim();
                 if (!line.isEmpty()) {
-                    lines.add(line);
+                    lines.append(line);
                 }
             }
         }

@@ -1,8 +1,9 @@
+
+import libs.MeuArrayList;
 import libs.TextFileReader;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) {
@@ -14,25 +15,41 @@ public class Main {
         }
         String filename = resource.getPath();
 
+        // Instâncias das tabelas hash
         AbstractHashTable<String> bitMix = new BitMixHashTable<>();
+        AbstractHashTable<String> fibo = new FibonacciHashTable<>();
 
         try {
             // Leitura dos nomes
-            ArrayList<String> names = TextFileReader.readLines(filename);
+            MeuArrayList<String> names = TextFileReader.readLines(filename);
 
             // Relatório para BitMixHashTable
             long startInsertBM = System.nanoTime();
-            for (int i = 0; i < names.size(); i++) {
+            for (int i = 0; i < names.tamanho(); i++) {
                 bitMix.insert(names.get(i));
             }
             long endInsertBM = System.nanoTime();
 
             long startSearchBM = System.nanoTime();
-            for (int i = 0; i < names.size(); i++) {
+            for (int i = 0; i < names.tamanho(); i++) {
                 bitMix.contains(names.get(i));
             }
             long endSearchBM = System.nanoTime();
 
+            // Relatório para FibonacciHashTable
+            long startInsertFH = System.nanoTime();
+            for (int i = 0; i < names.tamanho(); i++) {
+                fibo.insert(names.get(i));
+            }
+            long endInsertFH = System.nanoTime();
+
+            long startSearchFH = System.nanoTime();
+            for (int i = 0; i < names.tamanho(); i++) {
+                fibo.contains(names.get(i));
+            }
+            long endSearchFH = System.nanoTime();
+
+            // Imprimir relatório
             System.out.println("=== Relatório de Desempenho e Colisões ===\n");
 
             // BitMix
@@ -42,16 +59,21 @@ public class Main {
             System.out.printf("Tempo busca:    %.3f ms\n", (endSearchBM - startSearchBM) / 1_000_000.0);
             System.out.println("Colisões por bucket (clusterização):");
             int[] distBM = bitMix.getDistribution();
-            for (int i = 0; i < distBM.length; i++) {
-                System.out.printf("  Bucket %2d: %d entradas\n", i, distBM[i]);
-            }
             System.out.println();
 
+            // Fibonacci
+            System.out.println("--- FibonacciHashTable ---");
+            System.out.printf("Número total de colisões: %d\n", fibo.getCollisions());
+            System.out.printf("Tempo inserção: %.3f ms\n", (endInsertFH - startInsertFH) / 1_000_000.0);
+            System.out.printf("Tempo busca:    %.3f ms\n", (endSearchFH - startSearchFH) / 1_000_000.0);
+            System.out.println("Colisões por bucket (clusterização):");
+            int[] distFH = fibo.getDistribution();
+
+            System.out.println(fibo.contains("Maria")); // Exemplo de busca
 
         } catch (IOException e) {
             System.err.println("Erro ao ler arquivo: " + e.getMessage());
         }
     }
 }
-
 
