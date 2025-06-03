@@ -4,6 +4,7 @@ import libs.TextFileReader;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) {
@@ -18,6 +19,7 @@ public class Main {
         // Instâncias das tabelas hash
         AbstractHashTable<String> bitMix = new BitMixHashTable<>();
         AbstractHashTable<String> fibo = new FibonacciHashTable<>();
+        AbstractHashTable<String> wtf = new WhatthefuckHashTable<>();
 
         try {
             // Leitura dos nomes
@@ -48,6 +50,19 @@ public class Main {
                 fibo.contains(names.get(i));
             }
             long endSearchFH = System.nanoTime();
+            
+            
+            long startInsertWTF = System.nanoTime();
+            for (int i = 0; i < names.tamanho(); i++) {
+                wtf.insert(names.get(i));
+            }
+            long endInsertWTF = System.nanoTime();
+
+            long startSearchWTF = System.nanoTime();
+            for (int i = 0; i < names.tamanho(); i++) {
+                wtf.contains(names.get(i));
+            }
+            long endSearchWTF = System.nanoTime();
 
             // Imprimir relatório
             System.out.println("=== Relatório de Desempenho e Colisões ===\n");
@@ -68,8 +83,15 @@ public class Main {
             System.out.printf("Tempo busca:    %.3f ms\n", (endSearchFH - startSearchFH) / 1_000_000.0);
             System.out.println("Colisões por bucket (clusterização):");
             int[] distFH = fibo.getDistribution();
+            
 
-            System.out.println(fibo.contains("Maria")); // Exemplo de busca
+            System.out.println("--- wtf ---");
+            System.out.printf("Número total de colisões: %d\n", fibo.getCollisions());
+            System.out.printf("Tempo inserção: %.3f ms\n", (endInsertWTF - startInsertWTF) / 1_000_000.0);
+            System.out.printf("Tempo busca:    %.3f ms\n", (endSearchWTF - startSearchWTF) / 1_000_000.0);
+            System.out.println("Colisões por bucket (clusterização):");
+            int[] distWTF = fibo.getDistribution();
+
 
         } catch (IOException e) {
             System.err.println("Erro ao ler arquivo: " + e.getMessage());
