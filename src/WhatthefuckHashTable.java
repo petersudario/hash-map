@@ -10,6 +10,7 @@ public class WhatthefuckHashTable<K> extends AbstractHashTable<K> {
             sum += k_str.charAt(idx);
         }
         System.out.println(sum);
+        System.out.println("Hashing key: " + key);
         return (sum + peso) % k_len;
     }
 }
